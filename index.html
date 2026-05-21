@@ -30,6 +30,18 @@
   <meta name="twitter:image" content="https://verticalgrowthcoaching.com/jacob.jpg">
   <meta name="twitter:image:alt" content="Jacob V, midlife transformation coach and founder of Vertical Growth Coaching">
 
+  <!-- ── Google Tag Manager ──
+       Container: GTM-MJ2HJQQ3. GA4 is wired via the Google Tag *inside*
+       the GTM workspace (Measurement ID G-8TCDCKFJ7P), not directly here
+       — running both gtag.js and GTM would double-count events. Custom
+       dataLayer events are defined in the script at the bottom of <body>. -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-MJ2HJQQ3');</script>
+  <!-- End Google Tag Manager -->
+
   <!-- Structured data
        TODO: when available, add Jacob's social profile URLs into the Person and
        ProfessionalService "sameAs" arrays (LinkedIn, Instagram, YouTube, etc.).
@@ -1184,6 +1196,11 @@
 </head>
 <body>
 
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MJ2HJQQ3"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <a class="skip-link" href="#main">Skip to main content</a>
 
 <!-- NAV -->
@@ -1861,6 +1878,44 @@
 <!-- JAVASCRIPT: Quiz Engine + Data Capture -->
 <!-- ═══════════════════════════════════════ -->
 <script>
+  // ── GTM / GA4 DATALAYER ──
+  // Initialize the dataLayer so events queue even before GTM loads.
+  // When GTM is installed (see <head> snippet), it processes the existing
+  // queue and routes events to GA4, Meta Pixel, Google Ads, etc.
+  //
+  // PII RULE: never push email, name, phone, or any identifying string into
+  // dataLayer — GA4's ToS forbids PII storage. Pass aggregate properties only
+  // (scores, bands, source, location). PII lives in Netlify Forms / Calendly.
+  window.dataLayer = window.dataLayer || [];
+  function track(eventName, params) {
+    const payload = Object.assign({ event: eventName }, params || {});
+    window.dataLayer.push(payload);
+    console.log('📈 EVENT:', eventName, params || {});
+  }
+
+  // ── CTA CLICK TRACKING (delegated) ──
+  // Captures every click on a #book / #quiz / #framework anchor anywhere on
+  // the page, with the link text and originating section for attribution.
+  (function() {
+    const ctaMap = {
+      book:      'cta_click_book',
+      quiz:      'cta_click_quiz',
+      framework: 'cta_click_framework'
+    };
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a[href^="#"]');
+      if (!link) return;
+      const target = link.getAttribute('href').slice(1);
+      const eventName = ctaMap[target];
+      if (!eventName) return;
+      const section = link.closest('section, header, footer, .sticky-bar');
+      track(eventName, {
+        cta_label:    link.textContent.trim().slice(0, 80),
+        cta_location: (section && (section.id || section.tagName.toLowerCase())) || 'unknown'
+      });
+    });
+  })();
+
   // ── DATA STORE ──
   const quizData = {
     openingMoment: '',
@@ -1933,10 +1988,15 @@
   updateProgress('opening');
 
   // Auto-advance single-select buttons (opening, 1-7, primary)
+  let quizStartFired = false;
   document.querySelectorAll('.quiz-option[data-advance="auto"]').forEach(btn => {
     btn.addEventListener('click', function() {
       const step = this.closest('.quiz-step');
       const stepName = step.dataset.step;
+      if (!quizStartFired) {
+        track('quiz_start', { entry_step: stepName });
+        quizStartFired = true;
+      }
       step.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
       this.classList.add('selected');
 
@@ -2136,6 +2196,16 @@
       answers: quizData.answers.join(','),
       timeOnQuiz: String(timeOnQuiz)
     });
+
+    // GTM / GA4 conversion event — aggregate properties only, no PII.
+    track('quiz_complete', {
+      score: percentage,
+      score_band: label,
+      time_on_quiz_sec: timeOnQuiz,
+      age_band: quizData.ageBand || 'unknown',
+      marketing_consent: !!quizData.marketingConsent,
+      primary_pain: quizData.primaryPain || 'unknown'
+    });
   }
 
   // ── LEAD MAGNET FORM ──
@@ -2151,6 +2221,7 @@
     leads.push(leadData);
     console.log('📊 LEAD CAPTURED:', JSON.stringify(leadData, null, 2));
     submitToNetlify('lead-magnet', { email });
+    track('lead_magnet_signup', { asset: '5-signs-outside-in-guide' });
     e.target.style.display = 'none';
     document.getElementById('leadMagnetSuccess').classList.add('show');
   }
@@ -2162,6 +2233,7 @@
     leads.push({ type: 'newsletter', timestamp: new Date().toISOString(), email: email });
     console.log('📊 LEAD CAPTURED: newsletter signup -', email);
     submitToNetlify('newsletter', { email });
+    track('newsletter_signup', { location: 'footer' });
     e.target.innerHTML = '<p style="color: var(--green); font-size: 15px;">You\'re in. Welcome.</p>';
   }
 
@@ -2202,10 +2274,8 @@
     // Direct CRM hook (placeholder — wire up when CRM is connected).
     pushToCRM(booking);
 
-    // GTM / GA4 dataLayer — fires only if GTM is ever added.
-    if (window.dataLayer) {
-      window.dataLayer.push({ event: 'booked_a_call', source: 'calendly' });
-    }
+    // GTM / GA4 conversion event.
+    track('booked_a_call', { source: 'calendly' });
   });
 
   // ── CRM PUSH ──
