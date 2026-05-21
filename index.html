@@ -1006,41 +1006,29 @@
     /* ── BOOK A CALL (HIGH INTENT) ── */
     #book { background: var(--surface); }
     .book-inner {
-      max-width: 600px;
+      max-width: 880px;
       margin: 0 auto;
       text-align: center;
     }
-    .book-inner .section-body { margin: 0 auto 48px; }
-    .book-form { text-align: left; }
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-3);
-      margin-bottom: 8px;
-    }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
+    .book-inner .section-body { margin: 0 auto 40px; max-width: 600px; }
+    .calendly-inline-widget {
       width: 100%;
-      padding: 16px 20px;
-      background: var(--elevated);
+      min-width: 320px;
+      height: 720px;
+      margin: 0 auto;
       border: 1px solid var(--border);
-      color: var(--text-1);
-      font-size: 17px;
-      font-family: var(--sans);
-      outline: none;
-      transition: border-color 0.2s;
+      background: var(--surface);
     }
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus { border-color: var(--ember); }
-    .form-group textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
-    .form-group select option { background: var(--elevated); }
-    .book-form .btn-primary { width: 100%; text-align: center; margin-top: 8px; }
-    .book-form .privacy-note { font-size: 13px; color: var(--text-4); margin-top: 12px; text-align: center; }
+    .calendly-fallback {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-4);
+    }
+    .calendly-fallback a { color: var(--ember); text-decoration: none; border-bottom: 1px solid rgba(212,101,26,0.4); }
+    .calendly-fallback a:hover { color: var(--text-1); }
+    @media (max-width: 720px) {
+      .calendly-inline-widget { height: 1080px; }
+    }
 
     /* ── STICKY BOTTOM BAR ── */
     .sticky-bar {
@@ -1778,45 +1766,24 @@
     <div class="section-label">Ready?</div>
     <h2 class="section-title">Book a free discovery call.</h2>
     <p class="section-body">
-      30 minutes. No pitch, no pressure. We'll talk about where you are, where you want to be, and whether this work is the right fit.
+      30 minutes. No pitch, no pressure. Pick a time below and we'll talk about where you are, where you want to be, and whether this work is the right fit.
     </p>
-    <form class="book-form" name="book-call" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="handleBooking(event)">
-      <input type="hidden" name="form-name" value="book-call">
-      <p hidden><label>Don't fill this out: <input name="bot-field"></label></p>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-        <div class="form-group">
-          <label>First Name</label>
-          <input type="text" name="firstName" required>
-        </div>
-        <div class="form-group">
-          <label>Last Name</label>
-          <input type="text" name="lastName" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" required>
-      </div>
-      <div class="form-group">
-        <label>What's driving you to reach out?</label>
-        <select name="driver" required>
-          <option value="">Select one...</option>
-          <option value="career">Career feels hollow or stuck</option>
-          <option value="identity">Don't know who I am anymore</option>
-          <option value="relationships">Relationships are shifting</option>
-          <option value="purpose">Lost sense of purpose</option>
-          <option value="restless">Can't shake a feeling of restlessness</option>
-          <option value="other">Something else</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Anything else you want me to know?</label>
-        <textarea name="context" placeholder="Optional. Say as much or as little as you want."></textarea>
-      </div>
-      <button type="submit" class="btn-primary">Book My Call</button>
-      <p class="privacy-note">Your information stays between us. Period.</p>
-    </form>
-    <div class="success-msg" id="bookingSuccess">Got it. I'll be in touch within 24 hours to find a time that works.</div>
+
+    <!-- Calendly inline widget -->
+    <div class="calendly-inline-widget"
+         data-url="https://calendly.com/hello-verticalgrowthcoaching/30min?background_color=0F0E0A&text_color=F0E8DC&primary_color=D4651A&hide_gdpr_banner=1"
+         aria-label="Book a 30-minute discovery call with Jacob V"></div>
+    <noscript>
+      <p class="calendly-fallback">
+        Scheduling requires JavaScript. You can also
+        <a href="https://calendly.com/hello-verticalgrowthcoaching/30min" target="_blank" rel="noopener">open my Calendly directly</a>.
+      </p>
+    </noscript>
+    <p class="calendly-fallback">
+      Prefer to open Calendly in a new tab?
+      <a href="https://calendly.com/hello-verticalgrowthcoaching/30min" target="_blank" rel="noopener">Schedule here</a>.
+    </p>
+    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
   </div>
 </section>
 
@@ -1844,6 +1811,17 @@
   <input type="text" name="primaryPain">
   <input type="text" name="answers">
   <input type="text" name="timeOnQuiz">
+</form>
+
+<!-- Calendly booking conversion — captured via JS postMessage listener.
+     Every completed Calendly booking writes a row here, tagged 'booked_a_call'.
+     CRM integration: Netlify → Forms → calendly-booking → Notifications →
+     add an outgoing webhook (Zapier, Make, HubSpot, etc.). -->
+<form name="calendly-booking" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="text" name="tag">
+  <input type="text" name="event_uri">
+  <input type="text" name="invitee_uri">
+  <input type="text" name="timestamp">
 </form>
 
 <!-- FOOTER -->
@@ -2177,32 +2155,6 @@
     document.getElementById('leadMagnetSuccess').classList.add('show');
   }
 
-  // ── BOOKING FORM ──
-  function handleBooking(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const leadData = {
-      type: 'book_call',
-      timestamp: new Date().toISOString(),
-      firstName: formData.get('firstName'),
-      lastName: formData.get('lastName'),
-      email: formData.get('email'),
-      driver: formData.get('driver'),
-      context: formData.get('context')
-    };
-    leads.push(leadData);
-    console.log('📊 LEAD CAPTURED:', JSON.stringify(leadData, null, 2));
-    submitToNetlify('book-call', {
-      firstName: leadData.firstName || '',
-      lastName: leadData.lastName || '',
-      email: leadData.email || '',
-      driver: leadData.driver || '',
-      context: leadData.context || ''
-    });
-    e.target.style.display = 'none';
-    document.getElementById('bookingSuccess').classList.add('show');
-  }
-
   // ── FOOTER EMAIL ──
   function handleFooterEmail(e) {
     e.preventDefault();
@@ -2211,6 +2163,78 @@
     console.log('📊 LEAD CAPTURED: newsletter signup -', email);
     submitToNetlify('newsletter', { email });
     e.target.innerHTML = '<p style="color: var(--green); font-size: 15px;">You\'re in. Welcome.</p>';
+  }
+
+  // ── CALENDLY BOOKING CONVERSION ──
+  // Calendly's embedded widget emits postMessage events for the booking funnel.
+  // We only care about 'event_scheduled' — the moment someone successfully
+  // confirms a time. Everything booked here gets tagged 'booked_a_call' so
+  // downstream tools (Netlify Forms, CRM, analytics) can route on that tag.
+  window.addEventListener('message', function(e) {
+    if (!e.data || typeof e.data.event !== 'string' || e.data.event.indexOf('calendly') !== 0) return;
+    if (e.data.event !== 'calendly.event_scheduled') return;
+
+    // Calendly only exposes resource URIs to the embedded widget — full
+    // invitee details (name, email, custom answers) require a server-side
+    // Calendly API call OR a Calendly webhook. The URIs below are stable
+    // references we (or the CRM) can resolve later.
+    const payload = e.data.payload || {};
+    const booking = {
+      type: 'book_call',
+      tag: 'booked_a_call',
+      timestamp: new Date().toISOString(),
+      source: 'calendly',
+      event_uri: (payload.event && payload.event.uri) || '',
+      invitee_uri: (payload.invitee && payload.invitee.uri) || ''
+    };
+
+    leads.push(booking);
+    console.log('📊 LEAD CAPTURED: booked a call →', JSON.stringify(booking, null, 2));
+
+    // Durable record in Netlify Forms → outgoing webhook to any CRM.
+    submitToNetlify('calendly-booking', {
+      tag: booking.tag,
+      event_uri: booking.event_uri,
+      invitee_uri: booking.invitee_uri,
+      timestamp: booking.timestamp
+    });
+
+    // Direct CRM hook (placeholder — wire up when CRM is connected).
+    pushToCRM(booking);
+
+    // GTM / GA4 dataLayer — fires only if GTM is ever added.
+    if (window.dataLayer) {
+      window.dataLayer.push({ event: 'booked_a_call', source: 'calendly' });
+    }
+  });
+
+  // ── CRM PUSH ──
+  // Placeholder until a CRM is connected. When you wire one up, replace the
+  // body of this function with a fetch() to the CRM's intake endpoint.
+  // The `booking` object you receive includes:
+  //   { type, tag, timestamp, source, event_uri, invitee_uri }
+  //
+  // Examples (uncomment + edit one):
+  //   // Zapier webhook (easiest — Zap → any CRM):
+  //   fetch('https://hooks.zapier.com/hooks/catch/XXXXX/YYYYY/', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify(booking)
+  //   });
+  //
+  //   // HubSpot Forms API (no auth needed, public endpoint):
+  //   fetch('https://api.hsforms.com/submissions/v3/integration/submit/PORTAL/FORM', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ fields: [{ name: 'tag', value: booking.tag }, ...] })
+  //   });
+  //
+  //   // Airtable (use server-side proxy — never expose Airtable PAT in client JS):
+  //   fetch('/.netlify/functions/airtable-booking', { method: 'POST', body: JSON.stringify(booking) });
+  //
+  // Until then, the Netlify Forms record above is the source of truth.
+  function pushToCRM(_booking) {
+    // No-op until CRM is connected.
   }
 
   // ── STICKY BAR (show after scrolling past hero) ──
