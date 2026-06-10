@@ -1538,3 +1538,140 @@
       .module-row { grid-template-columns: 48px 1fr; gap: 18px; }
       .module-num { font-size: 28px; }
     }
+
+    /* ════════════════════════════════════════════ */
+    /* GRAPHIC LAYOUTS: photo heroes, bands, splits */
+    /* ════════════════════════════════════════════ */
+
+    /* ── Photographic hero ── */
+    .media-hero {
+      position: relative;
+      min-height: 580px;
+      display: flex;
+      align-items: flex-end;
+      padding: 150px 48px 64px;
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      overflow: hidden;
+      border-bottom: none;
+    }
+    .media-hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(18,30,26,0.34) 0%, rgba(18,30,26,0.52) 52%, rgba(18,30,26,0.84) 100%);
+    }
+    .media-hero .page-hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .media-hero .section-label { color: #A7DDF0; }
+    .media-hero h1 { color: #fff; }
+    .media-hero h1 em { color: #A7DDF0; font-style: italic; }
+    .media-hero .page-hero-lead { color: rgba(255,255,255,0.92); margin: 0 0 34px; }
+    .media-hero .cta-group { justify-content: flex-start; }
+    .media-hero .btn-ghost { color: #fff; }
+    .media-hero .btn-ghost:hover { color: #A7DDF0; }
+    .media-hero.center { align-items: center; }
+    .media-hero.center .page-hero-inner { text-align: center; }
+    .media-hero.center .cta-group { justify-content: center; }
+
+    /* ── Photographic CTA band ── */
+    .photo-band {
+      position: relative;
+      padding: 124px 48px;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      overflow: hidden;
+    }
+    .photo-band::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(18,30,26,0.55) 0%, rgba(18,30,26,0.72) 100%);
+    }
+    .photo-band > * { position: relative; z-index: 2; }
+    .photo-band h2 {
+      font-family: var(--font);
+      font-size: clamp(28px, 4.4vw, 44px);
+      font-weight: normal;
+      color: #fff;
+      margin-bottom: 16px;
+      line-height: 1.18;
+      max-width: 760px;
+      margin-left: auto; margin-right: auto;
+    }
+    .photo-band p {
+      font-size: 19px;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 40px;
+    }
+
+    /* ── Split (image | text) ── */
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .split-media {
+      min-height: 460px;
+      background-size: cover;
+      background-position: center;
+    }
+    .split-body {
+      padding: 88px 72px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .split-body .section-body { max-width: 520px; }
+    .split.reverse .split-media { order: 2; }
+    .split.dark { background: var(--anchor); }
+    .split.dark .section-label { color: #A7DDF0; }
+    .split.dark .section-title { color: #fff; }
+    .split.dark .section-body { color: rgba(255,255,255,0.86); }
+
+    /* ── Inset framed photo ── */
+    .photo-frame {
+      width: 100%;
+      border-radius: 2px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background-size: cover;
+      background-position: center;
+      min-height: 320px;
+    }
+
+    /* ── Topographic SVG divider ── */
+    .topo-divider { display: block; width: 100%; height: 56px; color: var(--border); }
+    .topo-divider svg { width: 100%; height: 100%; }
+
+    /* ── GRAPHIC RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .media-hero { min-height: 460px; padding: 112px 22px 48px; align-items: flex-end; }
+      .photo-band { padding: 84px 24px; }
+      .split { grid-template-columns: 1fr; }
+      .split.reverse .split-media { order: 0; }
+      .split-media { min-height: 240px; }
+      .split-body { padding: 56px 24px; }
+    }
+
+    /* ── Background images (full + mobile-optimized swap) ── */
+    .bg-lake        { background-image: url('/images/lake-reflection.jpg'); }
+    .bg-forest-light{ background-image: url('/images/forest-light.jpg'); }
+    .bg-forest-path { background-image: url('/images/forest-path.jpg'); }
+    .bg-light-rays  { background-image: url('/images/light-rays.jpg'); }
+    .bg-fog         { background-image: url('/images/fog-forest.jpg'); }
+    .bg-sky-ridge   { background-image: url('/images/sky-ridge.jpg'); }
+    @media (max-width: 900px) {
+      .bg-lake        { background-image: url('/images/lake-reflection-sm.jpg'); }
+      .bg-forest-light{ background-image: url('/images/forest-light-sm.jpg'); }
+      .bg-forest-path { background-image: url('/images/forest-path-sm.jpg'); }
+      .bg-light-rays  { background-image: url('/images/light-rays-sm.jpg'); }
+      .bg-fog         { background-image: url('/images/fog-forest-sm.jpg'); }
+      .bg-sky-ridge   { background-image: url('/images/sky-ridge-sm.jpg'); }
+    }
